@@ -57,12 +57,58 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<UserEntity> {
+      const user = await fastify.db.users.findOne({
+        key: "id",
+        equals: request.params.id,
+      });
+      if (!user) throw fastify.httpErrors.badRequest("This user not found");
+
+      const posts = await fastify.db.posts.findMany({
+        key: "userId",
+        equals: request.params.id,
+      });
+      if (posts) {
+        try {
+          posts.map(async (post) => {
+            await fastify.db.posts.delete(post.id);
+          });
+        } catch (error: any) {
+          throw fastify.httpErrors.badRequest(error);
+        }
+      }
+
+      const profile = await fastify.db.profiles.findOne({
+        key: "userId",
+        equals: request.params.id,
+      });
+
+      if (profile) {
+        await fastify.db.profiles.delete(profile.id);
+      }
+
+      const subscribes = await fastify.db.users.findMany({
+        key: "subscribedToUserIds",
+        inArray: request.params.id,
+      });
+
       try {
-        const deletedUser = await fastify.db.users.delete(request.params.id);
-        return deletedUser;
+        subscribes.map(async (subscribe) => {
+          const subscrIndex = subscribe.subscribedToUserIds.indexOf(
+            request.params.id
+          );
+
+          subscribe.subscribedToUserIds.splice(subscrIndex, 1);
+
+          await fastify.db.users.change(subscribe.id, {
+            subscribedToUserIds: subscribe.subscribedToUserIds,
+          });
+        });
       } catch (error: any) {
         throw fastify.httpErrors.badRequest(error);
       }
+
+      const deletedUser = await fastify.db.users.delete(request.params.id);
+      return deletedUser;
     }
   );
 
@@ -106,28 +152,27 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<UserEntity> {
-      const thisUser = await fastify.db.users.findOne({
+      const user = await fastify.db.users.findOne({
+        key: "id",
+        equals: request.params.id,
+      });
+      if (!user) throw fastify.httpErrors.notFound("This user not found");
+
+      const follower = await fastify.db.users.findOne({
         key: "id",
         equals: request.body.userId,
       });
+      if (!follower) throw fastify.httpErrors.badRequest("Follower not found");
 
-      if (thisUser) {
-        try {
-          const followed = thisUser.subscribedToUserIds.indexOf(
-            request.params.id
-          );
+      const subscribeIndex = follower.subscribedToUserIds.indexOf(user.id);
+      if (subscribeIndex == -1)
+        throw fastify.httpErrors.badRequest("User is not following him");
 
-          thisUser.subscribedToUserIds.splice(followed, 1);
-          const unsubscribe = await fastify.db.users.change(
-            request.body.userId,
-            { subscribedToUserIds: [...thisUser.subscribedToUserIds] }
-          );
-
-          return unsubscribe;
-        } catch (error: any) {
-          throw fastify.httpErrors.badRequest(error);
-        }
-      } else throw fastify.httpErrors.badRequest("This user not found");
+      follower.subscribedToUserIds.splice(subscribeIndex, 1);
+      const unsubscribe = fastify.db.users.change(follower.id, {
+        subscribedToUserIds: follower.subscribedToUserIds,
+      });
+      return unsubscribe;
     }
   );
 

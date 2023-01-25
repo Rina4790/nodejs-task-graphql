@@ -35,13 +35,17 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         body: createProfileBodySchema,
       },
     },
-    async function (request, reply): Promise<ProfileEntity> {
-      try {
-        const createdProfile = await fastify.db.profiles.create(request.body);
-        return createdProfile;
-      } catch (error: any) {
-        throw fastify.httpErrors.badRequest(error);
-      }
+	  async function (request, reply): Promise<ProfileEntity> {
+		 const userExist = await fastify.db.profiles.findOne({ key: 'userId', equals: request.body.userId })
+      if (userExist) {
+			throw fastify.httpErrors.badRequest('User profile already exists');
+		}
+		  const checkMemberTypes = await fastify.db.memberTypes.findOne({ key: 'id', equals: request.body.memberTypeId })
+		 if (!(checkMemberTypes)) {
+			throw fastify.httpErrors.badRequest('Member Type error');
+		 }
+		  const createdProfile = await fastify.db.profiles.create(request.body)
+		 return createdProfile;
     }
   );
 
