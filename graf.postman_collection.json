@@ -1,0 +1,185 @@
+{
+	"info": {
+		"_postman_id": "df268bec-e238-4b1a-ad73-eca3d0816289",
+		"name": "graf",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20054702"
+	},
+	"item": [
+		{
+			"name": "2.1 Get users, profiles, posts, memberTypes - 4 operations in one query.",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query {\n   users {\n      id,\n      firstName\n   }\n   profiles {\n      id,\n      birthday,\n      memberTypeId,\n   }\n   posts {\n      id,\n      title\n   }\n   memberTypes {\n      id,\n      monthPostsLimit\n   }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/graphql",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2.2 - Get user, profile, post, memberType by id - 4 operations in one query.",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query($userId: ID,  $profileId: ID, $postId: ID, $memberTypeId: String) {\n    user(id: $userId) {\n        id,\n        lastName\n    }\n    profile(id: $profileId) {\n        id,\n        birthday,\n    }\n    post(id: $postId) {\n        title,\n        content,\n    }\n    memberType(id: $memberTypeId) {\n        discount,\n        monthPostsLimit\n    }\n}",
+						"variables": "{\n  \"userId\": \"3cb2d920-4ee2-4468-bb02-8432ba31d213\",\n  \"profileId\": \"73e5ab79-952e-48fc-b082-0dd047a077c0\",\n  \"postId\": \"b2c59f38-77d5-480a-9218-ccce318c81b2\",\n  \"memberTypeId\": \"business\"\n}"
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/graphql",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2.3. Get users with their posts, profiles, memberTypes.",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query {\n    users {\n        id,\n        firstName,\n        posts {\n            id\n        },\n        profile {\n            id\n        },\n        memberType {\n            id,\n        }\n    }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/graphql",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2.4. Get user by id with his posts, profile, memberType.",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query ($id: ID) {\n    user (id: $id) {\n        id,\n        firstName,\n        posts {\n            id\n        },\n        profile {\n            id\n        },\n        memberType {\n            id,\n        }\n    }\n}",
+						"variables": "{\n  \"id\": \"d0064fdd-efc1-4997-9f3d-5982d5e0c9fa\"\n}"
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/graphql",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2.5. Get users with their userSubscribedTo, profile.",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query {\n   users {\n      id,\n      firstName,\n      profile {\n         id,\n         memberTypeId\n      },\n      userSubscribedTo  {\n         id,\n         firstName,\n      }\n   }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/graphql",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2.6. Get user by id with his subscribedToUser, posts.",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query($id: ID) {\n    user(id: $id) {\n        id,\n        firstName,\n        posts {\n            id,\n            title\n        },\n        subscribedToUser {\n            id,\n            firstName,\n        }\n    }\n}",
+						"variables": "{\n    \"id\": \"d0064fdd-efc1-4997-9f3d-5982d5e0c9fa\"\n}"
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/graphql",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2.7. Get users with their userSubscribedTo, subscribedToUser (additionally for each user in userSubscribedTo, subscribedToUser add their userSubscribedTo, subscribedToUser).",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "graphql",
+					"graphql": {
+						"query": "query {\n    users {\n      id,\n      firstName,\n      userSubscribedTo {\n          id,\n          firstName,\n          userSubscribedTo {\n              id,\n              firstName,\n          },\n          subscribedToUser {\n              id,\n              firstName,\n          },\n      },\n      subscribedToUser {\n          id,\n          firstName,\n          userSubscribedTo {\n              id,\n              firstName,\n          },\n          subscribedToUser {\n              id,\n              firstName,\n          },\n      },\n    }\n}",
+						"variables": ""
+					}
+				},
+				"url": {
+					"raw": "localhost:3000/graphql",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"graphql"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

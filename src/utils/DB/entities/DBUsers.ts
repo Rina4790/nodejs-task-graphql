@@ -1,5 +1,6 @@
 import * as crypto from 'node:crypto';
 import DBEntity from './DBEntity';
+import { users } from "./example";
 
 export type UserEntity = {
   id: string;
@@ -16,6 +17,12 @@ export default class DBUsers extends DBEntity<
   ChangeUserDTO,
   CreateUserDTO
 > {
+ //for check-integrity delete constructor and import { posts } and this string
+  constructor() {
+    super();
+    void this.entities.push(users[0]);
+    void this.entities.push(users[1]);
+  }
   async create(dto: CreateUserDTO) {
     const created: UserEntity = {
       ...dto,
