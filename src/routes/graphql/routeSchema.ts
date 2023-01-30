@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 import {
+  GraphQLID,
   GraphQLList,
-  GraphQLNonNull,
   GraphQLObjectType,
   GraphQLString,
 } from "graphql";
@@ -21,9 +21,9 @@ export const RootQuery = new GraphQLObjectType({
       async resolve(
         source,
         args,
-        context: FastifyInstance
+        fastify: FastifyInstance
       ): Promise<UserEntity[]> {
-        return await context.db.users.findMany();
+        return await fastify.db.users.findMany();
       },
     },
     profiles: {
@@ -31,9 +31,9 @@ export const RootQuery = new GraphQLObjectType({
       async resolve(
         source,
         args,
-        context: FastifyInstance
+        fastify: FastifyInstance
       ): Promise<ProfileEntity[]> {
-        return await context.db.profiles.findMany();
+        return await fastify.db.profiles.findMany();
       },
     },
     posts: {
@@ -41,9 +41,9 @@ export const RootQuery = new GraphQLObjectType({
       async resolve(
         source,
         args,
-        context: FastifyInstance
+        fastify: FastifyInstance
       ): Promise<PostEntity[]> {
-        return await context.db.posts.findMany();
+        return await fastify.db.posts.findMany();
       },
     },
     memberTypes: {
@@ -51,88 +51,80 @@ export const RootQuery = new GraphQLObjectType({
       async resolve(
         source,
         args,
-        context: FastifyInstance
+        fastify: FastifyInstance
       ): Promise<MemberTypeEntity[]> {
-        return await context.db.memberTypes.findMany();
+        return await fastify.db.memberTypes.findMany();
       },
     },
     user: {
       type: GraphQLUser,
       args: {
-        id: { type: new GraphQLNonNull(GraphQLString) },
+        id: { type: GraphQLID },
       },
-      async resolve(_, { id }, context: FastifyInstance): Promise<UserEntity> {
-        const user = await context.db.users.findOne({
+      async resolve(_, { id }, fastify: FastifyInstance): Promise<UserEntity> {
+        const user = await fastify.db.users.findOne({
           key: "id",
           equals: id,
         });
-
         if (!user) {
-          throw context.httpErrors.notFound(ErrorMessages.NOT_FOUND);
+          throw fastify.httpErrors.notFound(ErrorMessages.NOT_FOUND);
         }
-
         return user;
       },
     },
     profile: {
       type: ProfileGQL,
       args: {
-        id: { type: new GraphQLNonNull(GraphQLString) },
+        id: { type: GraphQLID },
       },
       async resolve(
         _,
         { id },
-        context: FastifyInstance
+        fastify: FastifyInstance
       ): Promise<ProfileEntity> {
-        const profile = await context.db.profiles.findOne({
+        const profile = await fastify.db.profiles.findOne({
           key: "id",
           equals: id,
         });
-
         if (!profile) {
-          throw context.httpErrors.notFound(ErrorMessages.NOT_FOUND);
+          throw fastify.httpErrors.notFound(ErrorMessages.NOT_FOUND);
         }
-
         return profile;
       },
     },
     post: {
       type: PostGQL,
       args: {
-        id: { type: new GraphQLNonNull(GraphQLString) },
+        id: { type: GraphQLID },
       },
-      async resolve(_, { id }, context: FastifyInstance): Promise<PostEntity> {
-        const post = await context.db.posts.findOne({
+      async resolve(_, { id }, fastify: FastifyInstance): Promise<PostEntity> {
+        const post = await fastify.db.posts.findOne({
           key: "id",
           equals: id,
         });
-
         if (!post) {
-          throw context.httpErrors.notFound(ErrorMessages.NOT_FOUND);
+          throw fastify.httpErrors.notFound(ErrorMessages.NOT_FOUND);
         }
-
         return post;
       },
     },
     memberType: {
       type: MemberTypeGQL,
       args: {
-        id: { type: new GraphQLNonNull(GraphQLString) },
+        id: { type: GraphQLString },
       },
       async resolve(
         _,
         { id },
-        context: FastifyInstance
+        fastify: FastifyInstance
       ): Promise<MemberTypeEntity> {
-        const memberType = await context.db.memberTypes.findOne({
+        const memberType = await fastify.db.memberTypes.findOne({
           key: "id",
           equals: id,
         });
-
         if (!memberType) {
-          throw context.httpErrors.notFound(ErrorMessages.NOT_FOUND);
+          throw fastify.httpErrors.notFound(ErrorMessages.NOT_FOUND);
         }
-
         return memberType;
       },
     },

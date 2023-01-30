@@ -35,11 +35,9 @@ export const GraphQLUser = new GraphQLObjectType({
 		},
 		userSubscribedTo: {
 			type: new GraphQLList(GraphQLUser),
-			async resolve( fastify: FastifyInstance) {
-				const allUsers = fastify.db.users.findMany();
-    return allUsers;
-			},
-		},
+			resolve: async ({ id }, _, fastify: FastifyInstance) =>
+			  await fastify.db.users.findMany({ key: "subscribedToUserIds", inArray: id }),
+		 },
 		memberType: {
 			type: MemberTypeGQL,
 			async resolve({ id }, args, fastify: FastifyInstance) {
@@ -47,11 +45,9 @@ export const GraphQLUser = new GraphQLObjectType({
 					key: 'userId',
 					equals: id,
 				});
-
 				if (!profile) {
 					return Promise.resolve(null);
 				}
-
 				return await fastify.db.memberTypes.findOne({
 					key: 'id',
 					equals: profile.memberTypeId,
@@ -59,7 +55,7 @@ export const GraphQLUser = new GraphQLObjectType({
 			},
 		},
 		posts: {
-			type: PostGQL,
+			type: new GraphQLList (PostGQL),
 			async resolve({ id }, args, fastify: FastifyInstance) {
 				return await fastify.db.posts.findMany({
 					key: 'userId',

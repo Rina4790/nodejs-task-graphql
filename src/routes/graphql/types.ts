@@ -17,7 +17,7 @@ export const MemberTypeGQL = new GraphQLObjectType({
 export const PostGQL = new GraphQLObjectType({
   name: "PostGQL",
   fields: () => ({
-    id: { type: GraphQLString },
+    id: { type: GraphQLID },
     title: { type: GraphQLString },
     content: { type: GraphQLString },
     userId: { type: GraphQLID },
@@ -27,7 +27,7 @@ export const PostGQL = new GraphQLObjectType({
 export const ProfileGQL = new GraphQLObjectType({
   name: "ProfileGQL",
   fields: () => ({
-    id: { type: GraphQLString },
+    id: { type: GraphQLID },
     userId: { type: GraphQLID },
     avatar: { type: GraphQLString },
     sex: { type: GraphQLString },
@@ -35,6 +35,6 @@ export const ProfileGQL = new GraphQLObjectType({
     country: { type: GraphQLString },
     street: { type: GraphQLString },
     city: { type: GraphQLString },
-    memberTypeId: { type: GraphQLString },
+    memberTypeId: { type: GraphQLID },
   }),
 });
